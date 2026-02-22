@@ -3,9 +3,8 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { LadderDimensions, ValidationRule } from "../types";
 import { STANDARDS_CONFIG } from "../constants";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
-export async function getTechnicalAdvice(dimensions: LadderDimensions, validations: ValidationRule[]) {
+export async function getTechnicalAdvice(dimensions: LadderDimensions, validations: ValidationRule[]): Promise<string> {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const failedRules = validations.filter(v => !v.isValid);
   const activeStandardName = STANDARDS_CONFIG[dimensions.standard].name;
   const isAudit = dimensions.mode === 'auditoria';
@@ -41,9 +40,10 @@ export async function getTechnicalAdvice(dimensions: LadderDimensions, validatio
         thinkingConfig: { thinkingBudget: 2500 }
       }
     });
-    return response.text;
+    // Ensure we return a string to avoid TypeScript 'undefined' errors
+    return response.text || "O modelo gerou uma resposta vazia.";
   } catch (error) {
     console.error("Gemini API Error:", error);
-    return "Erro no processamento da auditoria assistida. Verifique os dados de entrada.";
+    return "Erro no processamento da auditoria assistida. Verifique os dados de entrada ou a chave de API nas configurações do Vercel.";
   }
 }

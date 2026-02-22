@@ -233,7 +233,11 @@ const App: React.FC = () => {
                 onClick={() => {
                   setIsAiLoading(true);
                   getTechnicalAdvice(dims, validations).then(res => {
-                    setAiAnalysis(res);
+                    // res is now strictly string from geminiService, but we check just in case
+                    setAiAnalysis(res || "Falha ao obter análise.");
+                    setIsAiLoading(false);
+                  }).catch(() => {
+                    setAiAnalysis("Erro na comunicação com o motor de IA.");
                     setIsAiLoading(false);
                   });
                 }} 
